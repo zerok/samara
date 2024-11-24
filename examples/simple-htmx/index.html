@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
+        <meta name="htmx-config" content='{"selfRequestsOnly": false}' />
+    </head>
+    <body>
+        <div
+            hx-get="http://localhost:8080/api/v1/thread?uri=at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+            hx-swap="innerHTML"
+            hx-trigger="load"
+        ></div>
+    </body>
+</html>
