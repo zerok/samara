@@ -57,6 +57,7 @@ func main() {
 	srv := server.New(cfg)
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins: allowedOrigins,
+		AllowedHeaders: []string{"hx-current-url", "hx-request"},
 	})
 	httpSrv.Addr = addr
 	httpSrv.Handler = corsHandler.Handler(srv)
