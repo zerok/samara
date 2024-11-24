@@ -1,0 +1,470 @@
+{
+  "$type": "app.bsky.feed.defs#threadViewPost",
+  "post": {
+    "$type": "",
+    "author": {
+      "associated": {
+        "chat": {
+          "allowIncoming": "none"
+        }
+      },
+      "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:rcygvu3gobjenoognsjq3y4q/bafkreifpgitis4dpj3fiomw3ctlr2l2ksvdnfr2oygolou5zhstwpdxkeu@jpeg",
+      "createdAt": "2024-01-01T20:23:40.811Z",
+      "did": "did:plc:rcygvu3gobjenoognsjq3y4q",
+      "displayName": "Horst",
+      "handle": "zerokspot.com"
+    },
+    "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+    "embed": {
+      "$type": "app.bsky.embed.record#view",
+      "record": {
+        "$type": "app.bsky.graph.defs#starterPackViewBasic",
+        "cid": "bafyreicpcswnxi3kqxck3rjmb2hzmtonnaqu6v7w35qqdsp3vticngj4aa",
+        "creator": {
+          "associated": {
+            "chat": {
+              "allowIncoming": "none"
+            }
+          },
+          "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:rcygvu3gobjenoognsjq3y4q/bafkreifpgitis4dpj3fiomw3ctlr2l2ksvdnfr2oygolou5zhstwpdxkeu@jpeg",
+          "createdAt": "2024-01-01T20:23:40.811Z",
+          "did": "did:plc:rcygvu3gobjenoognsjq3y4q",
+          "displayName": "Horst",
+          "handle": "zerokspot.com"
+        },
+        "indexedAt": "2024-11-22T06:16:22.065Z",
+        "joinedAllTimeCount": 0,
+        "joinedWeekCount": 0,
+        "record": {
+          "$type": "app.bsky.graph.starterpack",
+          "createdAt": "2024-11-12T15:03:10.898Z",
+          "description": "People working at Grafana Labs on projects like Loki, Grafana, Tempo, Mimir, k6, and many, many more.",
+          "list": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.graph.list/3lar4425c5c2k",
+          "name": "Grafanistas"
+        },
+        "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.graph.starterpack/3lar442j43t2z"
+      }
+    },
+    "indexedAt": "2024-11-12T15:20:02.816Z",
+    "likeCount": 7,
+    "quoteCount": 0,
+    "record": {
+      "$type": "app.bsky.feed.post",
+      "createdAt": "2024-11-12T15:20:02.311Z",
+      "embed": {
+        "$type": "app.bsky.embed.record",
+        "record": {
+          "cid": "bafyreib542fqjslv7t46qyddvj2lqrq4i37t7db7r5rhz2qxmhb5yyyr7a",
+          "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.graph.starterpack/3lar442j43t2z"
+        }
+      },
+      "facets": [
+        {
+          "features": [
+            {
+              "$type": "app.bsky.richtext.facet#link",
+              "uri": "https://go.bsky.app/VEcwQQi"
+            }
+          ],
+          "index": {
+            "byteEnd": 109,
+            "byteStart": 90
+          }
+        },
+        {
+          "features": [
+            {
+              "$type": "app.bsky.richtext.facet#tag",
+              "tag": "grafana"
+            }
+          ],
+          "index": {
+            "byteEnd": 119,
+            "byteStart": 111
+          }
+        },
+        {
+          "features": [
+            {
+              "$type": "app.bsky.richtext.facet#tag",
+              "tag": "tempo"
+            }
+          ],
+          "index": {
+            "byteEnd": 126,
+            "byteStart": 120
+          }
+        },
+        {
+          "features": [
+            {
+              "$type": "app.bsky.richtext.facet#tag",
+              "tag": "loki"
+            }
+          ],
+          "index": {
+            "byteEnd": 132,
+            "byteStart": 127
+          }
+        },
+        {
+          "features": [
+            {
+              "$type": "app.bsky.richtext.facet#tag",
+              "tag": "mimir"
+            }
+          ],
+          "index": {
+            "byteEnd": 139,
+            "byteStart": 133
+          }
+        },
+        {
+          "features": [
+            {
+              "$type": "app.bsky.richtext.facet#tag",
+              "tag": "k6"
+            }
+          ],
+          "index": {
+            "byteEnd": 143,
+            "byteStart": 140
+          }
+        }
+      ],
+      "langs": [
+        "en"
+      ],
+      "text": "Working now on a starter pack for Grafanistas at Grafana Labs! This will grow over time!\n\ngo.bsky.app/VEcwQQi\n\n#grafana #tempo #loki #mimir #k6"
+    },
+    "replyCount": 3,
+    "repostCount": 9,
+    "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+  },
+  "replies": [
+    {
+      "$type": "app.bsky.feed.defs#threadViewPost",
+      "post": {
+        "$type": "",
+        "author": {
+          "associated": {
+            "chat": {
+              "allowIncoming": "all"
+            }
+          },
+          "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:jbdsssedyyelrlicite77r6m/bafkreialcg4zvu6vrnvk7ln4i2gy5rjybysni6jnylbpimyfsje6spzmjy@jpeg",
+          "createdAt": "2024-09-02T19:54:02.798Z",
+          "did": "did:plc:jbdsssedyyelrlicite77r6m",
+          "displayName": "Marylia Gutierrez, MSc.",
+          "handle": "marylia.dev"
+        },
+        "cid": "bafyreifcf3u3f4cc6xmdw26smy4mwq5vuzg6idvcqso6zjqdm37qj2stk4",
+        "indexedAt": "2024-11-22T03:57:13.562Z",
+        "likeCount": 0,
+        "quoteCount": 0,
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2024-11-22T03:57:15.176Z",
+          "langs": [
+            "en"
+          ],
+          "reply": {
+            "parent": {
+              "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+              "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+            },
+            "root": {
+              "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+              "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+            }
+          },
+          "text": "👋🏻"
+        },
+        "replyCount": 1,
+        "repostCount": 0,
+        "uri": "at://did:plc:jbdsssedyyelrlicite77r6m/app.bsky.feed.post/3lbj3ki3u4s2o"
+      },
+      "replies": [
+        {
+          "$type": "app.bsky.feed.defs#threadViewPost",
+          "post": {
+            "$type": "",
+            "author": {
+              "associated": {
+                "chat": {
+                  "allowIncoming": "none"
+                }
+              },
+              "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:rcygvu3gobjenoognsjq3y4q/bafkreifpgitis4dpj3fiomw3ctlr2l2ksvdnfr2oygolou5zhstwpdxkeu@jpeg",
+              "createdAt": "2024-01-01T20:23:40.811Z",
+              "did": "did:plc:rcygvu3gobjenoognsjq3y4q",
+              "displayName": "Horst",
+              "handle": "zerokspot.com"
+            },
+            "cid": "bafyreig5micuhr4y7f2dmcq3tl2yshvl74ehnco6tsvlyskip3okfrlb3a",
+            "indexedAt": "2024-11-22T06:17:08.972Z",
+            "likeCount": 0,
+            "quoteCount": 0,
+            "record": {
+              "$type": "app.bsky.feed.post",
+              "createdAt": "2024-11-22T06:17:08.620Z",
+              "langs": [
+                "en"
+              ],
+              "reply": {
+                "parent": {
+                  "cid": "bafyreifcf3u3f4cc6xmdw26smy4mwq5vuzg6idvcqso6zjqdm37qj2stk4",
+                  "uri": "at://did:plc:jbdsssedyyelrlicite77r6m/app.bsky.feed.post/3lbj3ki3u4s2o"
+                },
+                "root": {
+                  "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+                  "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+                }
+              },
+              "text": "Added 😃👋"
+            },
+            "replyCount": 0,
+            "repostCount": 0,
+            "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lbjdempgrs2e"
+          }
+        }
+      ]
+    },
+    {
+      "$type": "app.bsky.feed.defs#threadViewPost",
+      "post": {
+        "$type": "",
+        "author": {
+          "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fnw6jyl5cl5ibcxiu3rzqesw/bafkreiguzhqsfxclvtwsjsghylul6oeu5tg42peaf4d7f5mi4wemfxre5m@jpeg",
+          "createdAt": "2023-08-25T09:46:47.547Z",
+          "did": "did:plc:fnw6jyl5cl5ibcxiu3rzqesw",
+          "displayName": "inkel",
+          "handle": "inkel.bsky.social"
+        },
+        "cid": "bafyreidemyfyw32lk7a4kfrlp3rfteomvvtoonewamzqxhqncjppjs6sri",
+        "embed": {
+          "$type": "app.bsky.embed.external#view",
+          "external": {
+            "description": "",
+            "title": "",
+            "uri": "https://bsky.app/profile/grafana.bsky.social"
+          }
+        },
+        "indexedAt": "2024-11-16T12:39:15.496Z",
+        "likeCount": 0,
+        "quoteCount": 0,
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2024-11-16T12:39:14.716Z",
+          "embed": {
+            "$type": "app.bsky.embed.external",
+            "external": {
+              "description": "",
+              "title": "",
+              "uri": "https://bsky.app/profile/grafana.bsky.social"
+            }
+          },
+          "facets": [
+            {
+              "features": [
+                {
+                  "$type": "app.bsky.richtext.facet#link",
+                  "uri": "https://bsky.app/profile/grafana.bsky.social"
+                }
+              ],
+              "index": {
+                "byteEnd": 38,
+                "byteStart": 14
+              }
+            }
+          ],
+          "langs": [
+            "en"
+          ],
+          "reply": {
+            "parent": {
+              "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+              "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+            },
+            "root": {
+              "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+              "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+            }
+          },
+          "text": "Should we add bsky.app/profile/graf... to the pack? 🤔"
+        },
+        "replyCount": 1,
+        "repostCount": 0,
+        "uri": "at://did:plc:fnw6jyl5cl5ibcxiu3rzqesw/app.bsky.feed.post/3lb2vwdxvf22p"
+      },
+      "replies": [
+        {
+          "$type": "app.bsky.feed.defs#threadViewPost",
+          "post": {
+            "$type": "",
+            "author": {
+              "associated": {
+                "chat": {
+                  "allowIncoming": "none"
+                }
+              },
+              "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:rcygvu3gobjenoognsjq3y4q/bafkreifpgitis4dpj3fiomw3ctlr2l2ksvdnfr2oygolou5zhstwpdxkeu@jpeg",
+              "createdAt": "2024-01-01T20:23:40.811Z",
+              "did": "did:plc:rcygvu3gobjenoognsjq3y4q",
+              "displayName": "Horst",
+              "handle": "zerokspot.com"
+            },
+            "cid": "bafyreigphz5byhsdu2vojtt7qenvftlluvncqpivuhpsgicg3uzewigceq",
+            "indexedAt": "2024-11-16T12:57:50.582Z",
+            "likeCount": 0,
+            "quoteCount": 0,
+            "record": {
+              "$type": "app.bsky.feed.post",
+              "createdAt": "2024-11-16T12:57:50.049Z",
+              "langs": [
+                "en"
+              ],
+              "reply": {
+                "parent": {
+                  "cid": "bafyreidemyfyw32lk7a4kfrlp3rfteomvvtoonewamzqxhqncjppjs6sri",
+                  "uri": "at://did:plc:fnw6jyl5cl5ibcxiu3rzqesw/app.bsky.feed.post/3lb2vwdxvf22p"
+                },
+                "root": {
+                  "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+                  "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+                }
+              },
+              "text": "I would like to keep that starter pack to Grafanistas instead of also putting aggregated accounts/news-feeds into the mix 🙂"
+            },
+            "replyCount": 1,
+            "repostCount": 0,
+            "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lb2wxln4s223"
+          },
+          "replies": [
+            {
+              "$type": "app.bsky.feed.defs#threadViewPost",
+              "post": {
+                "$type": "",
+                "author": {
+                  "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fnw6jyl5cl5ibcxiu3rzqesw/bafkreiguzhqsfxclvtwsjsghylul6oeu5tg42peaf4d7f5mi4wemfxre5m@jpeg",
+                  "createdAt": "2023-08-25T09:46:47.547Z",
+                  "did": "did:plc:fnw6jyl5cl5ibcxiu3rzqesw",
+                  "displayName": "inkel",
+                  "handle": "inkel.bsky.social"
+                },
+                "cid": "bafyreihzu65kudkl53je3cabdgwi7sbrwp3g77jatdk3i6lau6tcb65qfi",
+                "indexedAt": "2024-11-16T13:05:25.498Z",
+                "likeCount": 0,
+                "quoteCount": 0,
+                "record": {
+                  "$type": "app.bsky.feed.post",
+                  "createdAt": "2024-11-16T13:05:24.987Z",
+                  "langs": [
+                    "en"
+                  ],
+                  "reply": {
+                    "parent": {
+                      "cid": "bafyreigphz5byhsdu2vojtt7qenvftlluvncqpivuhpsgicg3uzewigceq",
+                      "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lb2wxln4s223"
+                    },
+                    "root": {
+                      "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+                      "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+                    }
+                  },
+                  "text": "Makes sense"
+                },
+                "replyCount": 0,
+                "repostCount": 0,
+                "uri": "at://did:plc:fnw6jyl5cl5ibcxiu3rzqesw/app.bsky.feed.post/3lb2xf5ir5s2o"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "$type": "app.bsky.feed.defs#threadViewPost",
+      "post": {
+        "$type": "",
+        "author": {
+          "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:4c7476kfcvw6bfh4xhefmz2w/bafkreide5mtksvk5hci62y3gtyuftzt7uxxdjqbbmhfhgxuaoiaovs3i4u@jpeg",
+          "createdAt": "2023-07-31T22:43:16.717Z",
+          "did": "did:plc:4c7476kfcvw6bfh4xhefmz2w",
+          "displayName": "Dmitry Nekrasovski",
+          "handle": "dmitryn.bsky.social"
+        },
+        "cid": "bafyreib7aabmym4zv7kkqb2bpuafgfub5eimftxnq4ypd4xy52y2gfhp5e",
+        "indexedAt": "2024-11-13T17:58:12.581Z",
+        "likeCount": 0,
+        "quoteCount": 0,
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2024-11-13T17:58:12.248Z",
+          "langs": [
+            "en"
+          ],
+          "reply": {
+            "parent": {
+              "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+              "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+            },
+            "root": {
+              "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+              "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+            }
+          },
+          "text": "👋"
+        },
+        "replyCount": 1,
+        "repostCount": 0,
+        "uri": "at://did:plc:4c7476kfcvw6bfh4xhefmz2w/app.bsky.feed.post/3latwdwkqis2c"
+      },
+      "replies": [
+        {
+          "$type": "app.bsky.feed.defs#threadViewPost",
+          "post": {
+            "$type": "",
+            "author": {
+              "associated": {
+                "chat": {
+                  "allowIncoming": "none"
+                }
+              },
+              "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:rcygvu3gobjenoognsjq3y4q/bafkreifpgitis4dpj3fiomw3ctlr2l2ksvdnfr2oygolou5zhstwpdxkeu@jpeg",
+              "createdAt": "2024-01-01T20:23:40.811Z",
+              "did": "did:plc:rcygvu3gobjenoognsjq3y4q",
+              "displayName": "Horst",
+              "handle": "zerokspot.com"
+            },
+            "cid": "bafyreibjjtpyvpvszlxkrozjhnkpaxiibkgaezk24bjc3imbjxsyctla3i",
+            "indexedAt": "2024-11-13T21:02:11.080Z",
+            "likeCount": 1,
+            "quoteCount": 0,
+            "record": {
+              "$type": "app.bsky.feed.post",
+              "createdAt": "2024-11-13T21:02:10.673Z",
+              "langs": [
+                "en"
+              ],
+              "reply": {
+                "parent": {
+                  "cid": "bafyreib7aabmym4zv7kkqb2bpuafgfub5eimftxnq4ypd4xy52y2gfhp5e",
+                  "uri": "at://did:plc:4c7476kfcvw6bfh4xhefmz2w/app.bsky.feed.post/3latwdwkqis2c"
+                },
+                "root": {
+                  "cid": "bafyreihonvtd2de4w2dullucuazp2ygfssfxevpiuzseyoajeyo2ptfcha",
+                  "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lar526s5u22s"
+                }
+              },
+              "text": "Added 🙂"
+            },
+            "replyCount": 0,
+            "repostCount": 0,
+            "uri": "at://did:plc:rcygvu3gobjenoognsjq3y4q/app.bsky.feed.post/3lauamvmqg22p"
+          }
+        }
+      ]
+    }
+  ]
+}
