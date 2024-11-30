@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	github.com/bluesky-social/indigo v0.0.0-20241108221053-6e3c2e3e2dab
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/rs/cors v1.11.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.10.0
