@@ -6,19 +6,27 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log/slog"
 	"net/http"
+	"regexp"
 	"strings"
+	"time"
 
 	"github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/indigo/util"
 	"github.com/bluesky-social/indigo/xrpc"
+	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/yuin/goldmark"
 )
 
+var threadURIPattern = regexp.MustCompile(`at://[^/]+/app.bsky.feed.post/[a-z0-9]+`)
+
 type Server struct {
-	cfg    Configuration
-	mux    *http.ServeMux
-	client *xrpc.Client
+	cfg         Configuration
+	mux         *http.ServeMux
+	client      *xrpc.Client
+	threadCache *expirable.LRU[string, *bsky.FeedGetPostThread_Output]
+	logger      *slog.Logger
 }
 
 type Favorite struct {
@@ -29,9 +37,18 @@ type Favorite struct {
 }
 
 func New(cfg Configuration) *Server {
+	threadCache := expirable.NewLRU[string, *bsky.FeedGetPostThread_Output](10, nil, time.Minute*1)
+
+	logger := cfg.Logger
+	if logger == nil {
+		logger = slog.New(nil)
+	}
+
 	srv := &Server{
-		cfg:    cfg,
-		client: cfg.Client,
+		cfg:         cfg,
+		client:      cfg.Client,
+		threadCache: threadCache,
+		logger:      logger,
 	}
 
 	if srv.client == nil {
@@ -69,6 +86,10 @@ func (srv *Server) handleGetFavoritedBy(w http.ResponseWriter, r *http.Request) 
 	threadURI = r.URL.Query().Get("uri")
 	if !srv.isAllowedAccount(threadURI) {
 		http.Error(w, "not allowed root account", http.StatusBadRequest)
+		return
+	}
+	if !threadURIPattern.MatchString(threadURI) {
+		http.Error(w, "invalid uri", http.StatusBadRequest)
 		return
 	}
 
@@ -113,8 +134,15 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "not allowed root account", http.StatusBadRequest)
 		return
 	}
+	if !threadURIPattern.MatchString(threadURI) {
+		http.Error(w, "invalid uri", http.StatusBadRequest)
+		return
+	}
 
-	thread, err := bsky.FeedGetPostThread(r.Context(), srv.client, 5, 0, threadURI)
+	// TODO: normalize thread URI
+	thread, err := srv.getCachedThread(fmt.Sprintf("thread:%s", threadURI), func() (*bsky.FeedGetPostThread_Output, error) {
+		return bsky.FeedGetPostThread(r.Context(), srv.client, 5, 0, threadURI)
+	})
 	if err != nil {
 		http.Error(w, "backend request failed", http.StatusInternalServerError)
 		return
@@ -127,6 +155,21 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
 	io.WriteString(w, string(output))
 
+}
+
+func (srv *Server) getCachedThread(key string, fn func() (*bsky.FeedGetPostThread_Output, error)) (*bsky.FeedGetPostThread_Output, error) {
+	result, hit := srv.threadCache.Get(key)
+	if hit {
+		srv.logger.Debug("thread cache hit", "key", key)
+		return result, nil
+	}
+	srv.logger.Debug("thread cache miss", "key", key)
+	result, err := fn()
+	if err != nil {
+		return nil, err
+	}
+	srv.threadCache.Add(key, result)
+	return result, err
 }
 
 type ThreadRenderingData struct {

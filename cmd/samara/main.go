@@ -19,11 +19,23 @@ func main() {
 	var addr string
 	var allowedRootAccountHandles []string
 	var allowedOrigins []string
+	var logLevel string
 
 	pflag.StringVar(&addr, "addr", "0.0.0.0:8080", "Address to listen on")
 	pflag.StringSliceVar(&allowedRootAccountHandles, "allowed-root-account-handle", []string{}, "Allowed root account handles")
 	pflag.StringSliceVar(&allowedOrigins, "allowed-origin", []string{}, "Allowed origins (CORS)")
+	pflag.StringVar(&logLevel, "log-level", "warn", "Log level (debug, info, warn, error)")
 	pflag.Parse()
+
+	lvl := slog.LevelWarn
+	switch logLevel {
+	case "error":
+		lvl = slog.LevelError
+	case "info":
+		lvl = slog.LevelInfo
+	case "debug":
+		lvl = slog.LevelDebug
+	}
 
 	httpSrv := http.Server{}
 
@@ -35,11 +47,14 @@ func main() {
 		httpSrv.Shutdown(context.Background())
 	}()
 
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{}))
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: lvl,
+	}))
 
 	cfg := server.Configuration{
 		AllowedRootAccountDIDs: make([]string, 0, 5),
 		AllowedRootAccounts:    make([]string, 0, 5),
+		Logger:                 logger,
 	}
 
 	// Resolve handles to DIDs
