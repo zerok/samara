@@ -52,7 +52,12 @@ func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) isAllowedAccount(threadURI string) bool {
 	for _, did := range srv.cfg.AllowedRootAccountDIDs {
-		if strings.HasPrefix(threadURI, fmt.Sprintf("at://%s", did)) {
+		if strings.HasPrefix(threadURI, fmt.Sprintf("at://%s/", did)) {
+			return true
+		}
+	}
+	for _, handle := range srv.cfg.AllowedRootAccounts {
+		if strings.HasPrefix(threadURI, fmt.Sprintf("at://%s/", handle)) {
 			return true
 		}
 	}

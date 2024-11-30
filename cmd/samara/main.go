@@ -39,6 +39,7 @@ func main() {
 
 	cfg := server.Configuration{
 		AllowedRootAccountDIDs: make([]string, 0, 5),
+		AllowedRootAccounts:    make([]string, 0, 5),
 	}
 
 	// Resolve handles to DIDs
@@ -46,12 +47,13 @@ func main() {
 	client.Host = "https://public.api.bsky.app"
 
 	for _, handle := range allowedRootAccountHandles {
-		result, err := atproto.IdentityResolveHandle(ctx, client, "zerokspot.com")
+		result, err := atproto.IdentityResolveHandle(ctx, client, handle)
 		if err != nil {
 			logger.ErrorContext(ctx, "failed to resolve handle", "handle", handle, "err", err)
 			os.Exit(1)
 		}
 		cfg.AllowedRootAccountDIDs = append(cfg.AllowedRootAccountDIDs, result.Did)
+		cfg.AllowedRootAccounts = append(cfg.AllowedRootAccounts, handle)
 	}
 
 	srv := server.New(cfg)
