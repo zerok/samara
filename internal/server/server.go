@@ -194,18 +194,22 @@ func RenderThread(thread *bsky.FeedDefs_ThreadViewPost, level int) (template.HTM
 }
 
 var postTmpl = `
-<div class="bsky-feed-post bsky-feed-post--lvl{{ .Level }}">
+<div class="bsky-feed-thread bsky-feed-thread--lvl{{ .Level }}">
 	{{ if gt .Level 0 }}
+	<div class="bsky-feed-post">
 	<div class="bsky-feed-post__avatar">
 		<a href="https://bsky.app/profile/{{ .AuthorHandle }}" class="bsky-author-handle"><img src="{{ .AuthorAvatar }}" /></a>
 	</div>
-	<div class="bsky-feed-post__content">{{ .Text }}</div>
-	<a class="bsky-feed-post__date" href="https://bsky.app/profile/{{ .AuthorHandle }}/post/{{ .PostID }}">{{ .CreatedAt }}</a>
-	{{ if .ExternalEmbedURI }}
-	<div class="bsky-feed-post__embed">
-		<a href="{{ .ExternalEmbedURI }}" rel="no-follow">{{ .ExternalEmbedURI }}</a>
+	<div class="bsky-feed-post__content">
+		{{ .Text }}
+		{{ if .ExternalEmbedURI }}
+		<div class="bsky-feed-post__embed">
+			<a href="{{ .ExternalEmbedURI }}" rel="no-follow">{{ .ExternalEmbedURI }}</a>
+		</div>
+		{{ end }}
+		<a class="bsky-feed-post__date" href="https://bsky.app/profile/{{ .AuthorHandle }}/post/{{ .PostID }}">{{ .CreatedAt }}</a>
 	</div>
-	{{ end }}
+	</div>
 	{{ end }}
 	{{ if gt (len .Replies) 0 }}
 	<div class="bsky-feed-post__replies">
