@@ -1,0 +1,29 @@
+services:
+  alloy:
+    image: "grafana/alloy:v1.5.1"
+    volumes:
+      - "./config.alloy:/etc/alloy/config.alloy"
+      - "./data-alloy:/var/lib/alloy/data"
+    ports:
+      - "8899:8899"
+      - "4318:4318"
+      - "4317:4317"
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./config.alloy
+          target: /etc/alloy/config.alloy
+
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+      - --server.http.listen-addr=0.0.0.0:8899
+      - --stability.level=experimental # Enable all functionality
+  website:
+    image: "caddy:2.8.4-alpine"
+    ports:
+      - "8888:80"
+    volumes:
+      - "./:/usr/share/caddy"
+

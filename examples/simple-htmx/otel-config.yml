@@ -1,0 +1,13 @@
+file_format: "0.3"
+disabled: false
+propagator:
+  composite:
+    - tracecontext
+    - baggage
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          otlp:
+            protocol: http/protobuf
+            endpoint: "http://localhost:4318"

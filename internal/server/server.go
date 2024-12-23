@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -17,7 +18,13 @@ import (
 	"github.com/bluesky-social/indigo/xrpc"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/yuin/goldmark"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
+
+var tracerName = "github.com/zerok/samara/internal/server"
+var tracer = otel.Tracer(tracerName)
 
 var threadURIPattern = regexp.MustCompile(`at://[^/]+/app.bsky.feed.post/[a-z0-9]+`)
 
@@ -64,7 +71,10 @@ func New(cfg Configuration) *Server {
 }
 
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	srv.mux.ServeHTTP(w, r)
+	ctx, span := tracer.Start(r.Context(), "ServeHTTP")
+	defer span.End()
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.URLFull(r.URL.String()))
+	srv.mux.ServeHTTP(w, r.WithContext(ctx))
 }
 
 func (srv *Server) isAllowedAccount(threadURI string) bool {
@@ -84,6 +94,10 @@ func (srv *Server) isAllowedAccount(threadURI string) bool {
 func (srv *Server) handleGetFavoritedBy(w http.ResponseWriter, r *http.Request) {
 	var threadURI string
 	threadURI = r.URL.Query().Get("uri")
+	ctx, span := tracer.Start(r.Context(), "handleGetFavoritedBy")
+	defer span.End()
+	span.SetAttributes(attribute.String("com.zerokspot.samara.thread_uri", threadURI))
+
 	if !srv.isAllowedAccount(threadURI) {
 		http.Error(w, "not allowed root account", http.StatusBadRequest)
 		return
@@ -96,7 +110,7 @@ func (srv *Server) handleGetFavoritedBy(w http.ResponseWriter, r *http.Request) 
 	var cursor string
 	result := make([]Favorite, 0, 10)
 	for {
-		output, err := bsky.FeedGetLikes(r.Context(), srv.client, "", cursor, 10, threadURI)
+		output, err := bsky.FeedGetLikes(ctx, srv.client, "", cursor, 10, threadURI)
 		if err != nil {
 			http.Error(w, "backend request failed", http.StatusInternalServerError)
 			return
@@ -130,6 +144,9 @@ func (srv *Server) handleGetFavoritedBy(w http.ResponseWriter, r *http.Request) 
 func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 	var threadURI string
 	threadURI = r.URL.Query().Get("uri")
+	ctx, span := tracer.Start(r.Context(), "handleGetFavoritedBy")
+	defer span.End()
+	span.SetAttributes(attribute.String("com.zerokspot.samara.thread_uri", threadURI))
 	if !srv.isAllowedAccount(threadURI) {
 		http.Error(w, "not allowed root account", http.StatusBadRequest)
 		return
@@ -140,8 +157,8 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: normalize thread URI
-	thread, err := srv.getCachedThread(fmt.Sprintf("thread:%s", threadURI), func() (*bsky.FeedGetPostThread_Output, error) {
-		return bsky.FeedGetPostThread(r.Context(), srv.client, 5, 0, threadURI)
+	thread, err := srv.getCachedThread(ctx, fmt.Sprintf("thread:%s", threadURI), func() (*bsky.FeedGetPostThread_Output, error) {
+		return bsky.FeedGetPostThread(ctx, srv.client, 5, 0, threadURI)
 	})
 	if err != nil {
 		http.Error(w, "backend request failed", http.StatusInternalServerError)
@@ -157,8 +174,11 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (srv *Server) getCachedThread(key string, fn func() (*bsky.FeedGetPostThread_Output, error)) (*bsky.FeedGetPostThread_Output, error) {
+func (srv *Server) getCachedThread(ctx context.Context, key string, fn func() (*bsky.FeedGetPostThread_Output, error)) (*bsky.FeedGetPostThread_Output, error) {
+	ctx, span := tracer.Start(ctx, "getCachedThread")
+	defer span.End()
 	result, hit := srv.threadCache.Get(key)
+	span.SetAttributes(attribute.Bool("sarama.thread.cache_hit", hit))
 	if hit {
 		srv.logger.Debug("thread cache hit", "key", key)
 		return result, nil
