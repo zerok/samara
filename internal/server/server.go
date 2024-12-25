@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -64,7 +63,6 @@ func New(cfg Configuration) *Server {
 		}
 	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/v1/favorited_by", srv.handleGetFavoritedBy)
 	mux.HandleFunc("/api/v1/thread", srv.handleGetThread)
 	srv.mux = mux
 	return srv
@@ -91,60 +89,10 @@ func (srv *Server) isAllowedAccount(threadURI string) bool {
 	return false
 }
 
-func (srv *Server) handleGetFavoritedBy(w http.ResponseWriter, r *http.Request) {
-	var threadURI string
-	threadURI = r.URL.Query().Get("uri")
-	ctx, span := tracer.Start(r.Context(), "handleGetFavoritedBy")
-	defer span.End()
-	span.SetAttributes(attribute.String("com.zerokspot.samara.thread_uri", threadURI))
-
-	if !srv.isAllowedAccount(threadURI) {
-		http.Error(w, "not allowed root account", http.StatusBadRequest)
-		return
-	}
-	if !threadURIPattern.MatchString(threadURI) {
-		http.Error(w, "invalid uri", http.StatusBadRequest)
-		return
-	}
-
-	var cursor string
-	result := make([]Favorite, 0, 10)
-	for {
-		output, err := bsky.FeedGetLikes(ctx, srv.client, "", cursor, 10, threadURI)
-		if err != nil {
-			http.Error(w, "backend request failed", http.StatusInternalServerError)
-			return
-		}
-		for _, like := range output.Likes {
-			fav := Favorite{}
-			if like.Actor == nil {
-				continue
-			}
-			if like.Actor.Avatar != nil {
-				fav.Avatar = *like.Actor.Avatar
-			}
-			fav.DID = like.Actor.Did
-			fav.Handle = like.Actor.Handle
-			if like.Actor.DisplayName != nil {
-				fav.DisplayName = *like.Actor.DisplayName
-			}
-			result = append(result, fav)
-		}
-		if output.Cursor == nil {
-			break
-		}
-		cursor = *output.Cursor
-	}
-
-	w.Header().Add("Content-Type", "text/json")
-	json.NewEncoder(w).Encode(result)
-
-}
-
 func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 	var threadURI string
 	threadURI = r.URL.Query().Get("uri")
-	ctx, span := tracer.Start(r.Context(), "handleGetFavoritedBy")
+	ctx, span := tracer.Start(r.Context(), "handleGetThread")
 	defer span.End()
 	span.SetAttributes(attribute.String("com.zerokspot.samara.thread_uri", threadURI))
 	if !srv.isAllowedAccount(threadURI) {
