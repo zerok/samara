@@ -109,7 +109,7 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: normalize thread URI
-	thread, err := srv.getCachedThread(ctx, fmt.Sprintf("thread:%s", threadURI), func() (*bsky.FeedGetPostThread_Output, error) {
+	thread, err := srv.getCachedThread(ctx, fmt.Sprintf("thread:%s", threadURI), func(ctx context.Context) (*bsky.FeedGetPostThread_Output, error) {
 		return bsky.FeedGetPostThread(ctx, srv.client, 5, 0, threadURI)
 	})
 	if err != nil {
@@ -139,7 +139,7 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (srv *Server) getCachedThread(ctx context.Context, key string, fn func() (*bsky.FeedGetPostThread_Output, error)) (*bsky.FeedGetPostThread_Output, error) {
+func (srv *Server) getCachedThread(ctx context.Context, key string, fn func(context.Context) (*bsky.FeedGetPostThread_Output, error)) (*bsky.FeedGetPostThread_Output, error) {
 	ctx, span := tracer.Start(ctx, "getCachedThread")
 	defer span.End()
 	result, hit := srv.threadCache.Get(key)
@@ -149,7 +149,7 @@ func (srv *Server) getCachedThread(ctx context.Context, key string, fn func() (*
 		return result, nil
 	}
 	srv.logger.Debug("thread cache miss", "key", key)
-	result, err := fn()
+	result, err := fn(ctx)
 	if err != nil {
 		return nil, err
 	}
