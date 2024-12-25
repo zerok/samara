@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -17,8 +18,9 @@ import (
 	"github.com/bluesky-social/indigo/xrpc"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/yuin/goldmark"
+	"github.com/zerok/samara/internal/telemetry"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
@@ -94,12 +96,14 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 	threadURI = r.URL.Query().Get("uri")
 	ctx, span := tracer.Start(r.Context(), "handleGetThread")
 	defer span.End()
-	span.SetAttributes(attribute.String("com.zerokspot.samara.thread_uri", threadURI))
+	span.SetAttributes(telemetry.ThreadURIKey.String(threadURI))
 	if !srv.isAllowedAccount(threadURI) {
+		span.SetStatus(codes.Ok, "not allowed account")
 		http.Error(w, "not allowed root account", http.StatusBadRequest)
 		return
 	}
 	if !threadURIPattern.MatchString(threadURI) {
+		span.SetStatus(codes.Ok, "invalid uri")
 		http.Error(w, "invalid uri", http.StatusBadRequest)
 		return
 	}
@@ -109,16 +113,29 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 		return bsky.FeedGetPostThread(ctx, srv.client, 5, 0, threadURI)
 	})
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "backend request failed")
 		http.Error(w, "backend request failed", http.StatusInternalServerError)
 		return
 	}
-	output, err := RenderThread(thread.Thread.FeedDefs_ThreadViewPost, 0)
+	output, html, err := RenderThread(ctx, thread.Thread.FeedDefs_ThreadViewPost, 0)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "rendering failed")
 		http.Error(w, "rendering failed", http.StatusInternalServerError)
+		return
 	}
 
-	w.Header().Add("Content-Type", "text/html; charset=utf-8")
-	io.WriteString(w, string(output))
+	// Depending on HTMX vs. raw XHR, render that whole thing as single HTML or
+	// as JSON
+	span.SetStatus(codes.Ok, "")
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Add("Content-Type", "text/html; charset=utf-8")
+		io.WriteString(w, string(html))
+		return
+	}
+	w.Header().Add("Content-Type", "text/json")
+	json.NewEncoder(w).Encode(output)
 
 }
 
@@ -126,7 +143,7 @@ func (srv *Server) getCachedThread(ctx context.Context, key string, fn func() (*
 	ctx, span := tracer.Start(ctx, "getCachedThread")
 	defer span.End()
 	result, hit := srv.threadCache.Get(key)
-	span.SetAttributes(attribute.Bool("sarama.thread.cache_hit", hit))
+	span.SetAttributes(telemetry.ThreadCacheHitKey.Bool(hit))
 	if hit {
 		srv.logger.Debug("thread cache hit", "key", key)
 		return result, nil
@@ -141,51 +158,57 @@ func (srv *Server) getCachedThread(ctx context.Context, key string, fn func() (*
 }
 
 type ThreadRenderingData struct {
-	URI                string
-	PostID             string
-	Text               template.HTML
-	Replies            []template.HTML
-	CreatedAt          string
-	Level              int
-	AuthorHandle       string
-	AuthorDID          string
-	AuthorAvatar       string
-	ExternalEmbedURI   string
-	ExternalEmbedTitle string
+	URI                string                `json:"uri"`
+	PostID             string                `json:"postID"`
+	Text               string                `json:"text"`
+	RenderedText       template.HTML         `json:"-"`
+	Replies            []ThreadRenderingData `json:"replies"`
+	RenderedReplies    []template.HTML       `json:"-"`
+	CreatedAt          string                `json:"createdAt"`
+	Level              int                   `json:"level"`
+	AuthorHandle       string                `json:"authorHandle"`
+	AuthorDID          string                `json:"authorDID"`
+	AuthorAvatar       string                `json:"authorAvatar"`
+	ExternalEmbedURI   string                `json:"externalEmbedURI"`
+	ExternalEmbedTitle string                `json:"externalEmbedTitle"`
 }
 
-func RenderThread(thread *bsky.FeedDefs_ThreadViewPost, level int) (template.HTML, error) {
+func RenderThread(ctx context.Context, thread *bsky.FeedDefs_ThreadViewPost, level int) (*ThreadRenderingData, template.HTML, error) {
+	replies := make([]ThreadRenderingData, 0, len(thread.Replies))
 	renderedReplies := make([]template.HTML, 0, len(thread.Replies))
 	for _, reply := range thread.Replies {
-		r, err := RenderThread(reply.FeedDefs_ThreadViewPost, level+1)
+		r, rendered, err := RenderThread(ctx, reply.FeedDefs_ThreadViewPost, level+1)
 		if err != nil {
-			return "", err
+			return nil, "", err
 		}
-		renderedReplies = append(renderedReplies, r)
+		replies = append(replies, *r)
+		renderedReplies = append(renderedReplies, rendered)
 	}
 	post := thread.Post.Record.Val.(*bsky.FeedPost)
 	markdown := goldmark.New()
 	var textOutput bytes.Buffer
 	if err := markdown.Convert([]byte(post.Text), &textOutput); err != nil {
-		return "", err
+		return nil, "", err
 	}
 
 	data := ThreadRenderingData{
-		URI:          thread.Post.Uri,
-		PostID:       "",
-		Text:         template.HTML(textOutput.String()),
-		Replies:      renderedReplies,
-		Level:        level,
-		CreatedAt:    post.CreatedAt,
-		AuthorHandle: thread.Post.Author.Handle,
-		AuthorDID:    thread.Post.Author.Did,
+		URI:             thread.Post.Uri,
+		PostID:          "",
+		RenderedText:    template.HTML(textOutput.String()),
+		Text:            post.Text,
+		Replies:         replies,
+		RenderedReplies: renderedReplies,
+		Level:           level,
+		CreatedAt:       post.CreatedAt,
+		AuthorHandle:    thread.Post.Author.Handle,
+		AuthorDID:       thread.Post.Author.Did,
 	}
 	if thread.Post.Author.Avatar != nil {
 		data.AuthorAvatar = strings.Replace(*thread.Post.Author.Avatar, "avatar", "avatar_thumbnail", -1)
 	}
 	parsedURI, err := util.ParseAtUri(thread.Post.Uri)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 	data.PostID = parsedURI.Rkey
 	if post.Embed != nil && post.Embed.EmbedExternal != nil {
@@ -196,12 +219,17 @@ func RenderThread(thread *bsky.FeedDefs_ThreadViewPost, level int) (template.HTM
 			data.ExternalEmbedURI = post.Embed.EmbedExternal.External.Title
 		}
 	}
+	html, err := renderThreadToHTML(ctx, data)
+	return &data, html, err
+}
+
+func renderThreadToHTML(ctx context.Context, thread ThreadRenderingData) (template.HTML, error) {
 	tmpl := template.Must(template.New("thread").Parse(postTmpl))
-	var out bytes.Buffer
-	if err := tmpl.Execute(&out, data); err != nil {
+	var output bytes.Buffer
+	if err := tmpl.Execute(&output, thread); err != nil {
 		return "", err
 	}
-	return template.HTML(out.String()), nil
+	return template.HTML(output.String()), nil
 }
 
 var postTmpl = `
@@ -212,7 +240,7 @@ var postTmpl = `
 		<a href="https://bsky.app/profile/{{ .AuthorHandle }}" class="bsky-author-handle"><img src="{{ .AuthorAvatar }}" /></a>
 	</div>
 	<div class="bsky-feed-post__content">
-		{{ .Text }}
+		{{ .RenderedText }}
 		{{ if .ExternalEmbedURI }}
 		<div class="bsky-feed-post__embed">
 			<a href="{{ .ExternalEmbedURI }}" rel="no-follow">{{ .ExternalEmbedURI }}</a>
@@ -224,7 +252,7 @@ var postTmpl = `
 	{{ end }}
 	{{ if gt (len .Replies) 0 }}
 	<div class="bsky-feed-post__replies">
-		{{ range .Replies }}
+		{{ range .RenderedReplies }}
 		{{ . }}
 		{{ end }}
 	</div>
