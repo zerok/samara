@@ -16,7 +16,7 @@ func TestThreadRendering(t *testing.T) {
 	require.NotNil(t, thread)
 
 	t.Run("no error", func(t *testing.T) {
-		_, err := RenderThread(thread, 0)
+		_, _, err := RenderThread(context.Background(), thread, 0)
 		require.NoError(t, err)
 	})
 }
