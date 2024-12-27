@@ -14,9 +14,10 @@ import (
 func TestThreadRendering(t *testing.T) {
 	thread := getOrCreateTestThread(t)
 	require.NotNil(t, thread)
+	srv := New(Configuration{})
 
 	t.Run("no error", func(t *testing.T) {
-		_, _, err := RenderThread(context.Background(), thread, 0)
+		_, _, err := srv.renderThread(context.Background(), thread, 0)
 		require.NoError(t, err)
 	})
 }
