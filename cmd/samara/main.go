@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/bluesky-social/indigo/api/atproto"
 	"github.com/bluesky-social/indigo/xrpc"
 	"github.com/rs/cors"
 	"github.com/spf13/pflag"
+	"github.com/valkey-io/valkey-go"
+	"github.com/zerok/samara/internal/caching"
 	"github.com/zerok/samara/internal/server"
 	config "go.opentelemetry.io/contrib/config/v0.3.0"
 	"go.opentelemetry.io/otel"
@@ -29,6 +32,7 @@ func main() {
 	var logLevel string
 	var showVersion bool
 	var baseURL string
+	var valkeyHostname string
 
 	pflag.StringVar(&addr, "addr", "0.0.0.0:8080", "Address to listen on")
 	pflag.StringSliceVar(&allowedRootAccountHandles, "allowed-root-account-handle", []string{}, "Allowed root account handles")
@@ -37,6 +41,7 @@ func main() {
 	pflag.StringVar(&otelConfigFile, "otel-config", "", "Path to an OpenTelemetry configuration file")
 	pflag.BoolVar(&showVersion, "version", false, "Print version information")
 	pflag.StringVar(&baseURL, "base-url", "http://localhost:8080", "Base URL to be used for linking inside the results")
+	pflag.StringVar(&valkeyHostname, "valkey-hostname", "", "Hostname of a valkey caching server")
 	pflag.Parse()
 
 	if version == "" {
@@ -65,6 +70,23 @@ func main() {
 		Level: lvl,
 	}))
 
+	var cache caching.Cache
+	var err error
+	if valkeyHostname != "" {
+		valkeyClient, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{valkeyHostname}})
+		if err != nil {
+			logger.ErrorContext(ctx, "valkey connection failed", "err", err)
+			os.Exit(1)
+		}
+		defer valkeyClient.Close()
+		cache = caching.NewValkeyCache(caching.Configuration{
+			ValkeyClient:      valkeyClient,
+			DefaultExpiration: time.Minute * 5,
+		})
+	} else {
+		cache = caching.NewLocalCache()
+	}
+
 	httpSrv := http.Server{}
 
 	shutdownOtel, err := setupOTelSDK(ctx, otelConfigFile)
@@ -85,6 +107,7 @@ func main() {
 		AllowedRootAccounts:    make([]string, 0, 5),
 		Logger:                 logger,
 		BaseURL:                baseURL,
+		Cache:                  cache,
 	}
 
 	// Resolve handles to DIDs
@@ -92,12 +115,17 @@ func main() {
 	client.Host = "https://public.api.bsky.app"
 
 	for _, handle := range allowedRootAccountHandles {
-		result, err := atproto.IdentityResolveHandle(ctx, client, handle)
-		if err != nil {
-			logger.ErrorContext(ctx, "failed to resolve handle", "handle", handle, "err", err)
-			os.Exit(1)
+		did, found, _ := cache.GetString(ctx, "handle-did:"+handle)
+		if !found {
+			result, err := atproto.IdentityResolveHandle(ctx, client, handle)
+			if err != nil {
+				logger.ErrorContext(ctx, "failed to resolve handle", "handle", handle, "err", err)
+				os.Exit(1)
+			}
+			did = result.Did
+			cache.SetString(ctx, "handle-did:"+handle, result.Did)
 		}
-		cfg.AllowedRootAccountDIDs = append(cfg.AllowedRootAccountDIDs, result.Did)
+		cfg.AllowedRootAccountDIDs = append(cfg.AllowedRootAccountDIDs, did)
 		cfg.AllowedRootAccounts = append(cfg.AllowedRootAccounts, handle)
 	}
 

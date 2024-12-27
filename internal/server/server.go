@@ -17,8 +17,8 @@ import (
 	"github.com/bluesky-social/indigo/api/bsky"
 	"github.com/bluesky-social/indigo/util"
 	"github.com/bluesky-social/indigo/xrpc"
-	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/yuin/goldmark"
+	"github.com/zerok/samara/internal/caching"
 	"github.com/zerok/samara/internal/telemetry"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
@@ -31,40 +31,33 @@ var tracer = otel.Tracer(tracerName)
 var threadURIPattern = regexp.MustCompile(`at://[^/]+/app.bsky.feed.post/[a-z0-9]+`)
 
 type Server struct {
-	cfg                    Configuration
-	mux                    *http.ServeMux
-	client                 *xrpc.Client
-	threadCache            *expirable.LRU[string, *bsky.FeedGetPostThread_Output]
-	allowedAvatarDIDsCache *expirable.LRU[string, bool]
-	logger                 *slog.Logger
-	avatarHTTPClient       *http.Client
-	baseURL                string
-}
-
-type Favorite struct {
-	DID         string `json:"did"`
-	Handle      string `json:"handle"`
-	DisplayName string `json:"displayName,omitempty"`
-	Avatar      string `json:"avatar,omitempty"`
+	cfg              Configuration
+	mux              *http.ServeMux
+	client           *xrpc.Client
+	cache            caching.Cache
+	logger           *slog.Logger
+	avatarHTTPClient *http.Client
+	baseURL          string
 }
 
 func New(cfg Configuration) *Server {
-	threadCache := expirable.NewLRU[string, *bsky.FeedGetPostThread_Output](10, nil, time.Minute*1)
-	allowedAvatarDIDsCache := expirable.NewLRU[string, bool](1000, nil, time.Minute*1)
-
 	logger := cfg.Logger
 	if logger == nil {
 		logger = slog.Default()
 	}
 
+	cache := cfg.Cache
+	if cache == nil {
+		cache = caching.NewNoopCache()
+	}
+
 	srv := &Server{
-		cfg:                    cfg,
-		client:                 cfg.Client,
-		threadCache:            threadCache,
-		allowedAvatarDIDsCache: allowedAvatarDIDsCache,
-		logger:                 logger,
-		avatarHTTPClient:       &http.Client{},
-		baseURL:                cfg.BaseURL,
+		cfg:              cfg,
+		client:           cfg.Client,
+		cache:            cache,
+		logger:           logger,
+		avatarHTTPClient: &http.Client{},
+		baseURL:          cfg.BaseURL,
 	}
 
 	if srv.client == nil {
@@ -108,7 +101,7 @@ func (srv *Server) handleGetAvatar(w http.ResponseWriter, r *http.Request) {
 
 	span.SetAttributes(telemetry.AvatarDIDKey.String(did))
 
-	if _, allowed := srv.allowedAvatarDIDsCache.Get(did); !allowed {
+	if allowed, _ := srv.cache.Exists(ctx, allowedAvatarCacheKey(did)); !allowed {
 		span.SetStatus(codes.Ok, "not allowed avatar")
 		http.Error(w, "not allowed avatar", http.StatusForbidden)
 		return
@@ -187,7 +180,7 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 func (srv *Server) getCachedThread(ctx context.Context, key string, fn func(context.Context) (*bsky.FeedGetPostThread_Output, error)) (*bsky.FeedGetPostThread_Output, error) {
 	ctx, span := tracer.Start(ctx, "getCachedThread")
 	defer span.End()
-	result, hit := srv.threadCache.Get(key)
+	result, hit, _ := srv.cache.GetThread(ctx, key)
 	span.SetAttributes(telemetry.ThreadCacheHitKey.Bool(hit))
 	if hit {
 		srv.logger.Debug("thread cache hit", "key", key)
@@ -198,7 +191,7 @@ func (srv *Server) getCachedThread(ctx context.Context, key string, fn func(cont
 	if err != nil {
 		return nil, err
 	}
-	srv.threadCache.Add(key, result)
+	srv.cache.SetThread(ctx, key, result, caching.WithTTL(time.Minute*5))
 	return result, err
 }
 
@@ -253,7 +246,7 @@ func (srv *Server) renderThread(ctx context.Context, thread *bsky.FeedDefs_Threa
 		did, err := extractDID(*thread.Post.Author.Avatar)
 		if err == nil {
 
-			srv.allowedAvatarDIDsCache.Add(did, true)
+			srv.cache.SetString(ctx, allowedAvatarCacheKey(did), "true", caching.WithTTL(time.Minute))
 			params := url.Values{}
 			params.Add("did", did)
 			data.AuthorAvatar = fmt.Sprintf("%s/api/v1/avatar?%s", srv.baseURL, params.Encode())
@@ -283,6 +276,10 @@ func extractDID(s string) (string, error) {
 		return "", fmt.Errorf("no did found")
 	}
 	return match[1], nil
+}
+
+func allowedAvatarCacheKey(did string) string {
+	return fmt.Sprintf("allowed-avatar:%s", did)
 }
 
 func renderThreadToHTML(_ context.Context, thread ThreadRenderingData) (template.HTML, error) {
