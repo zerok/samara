@@ -28,6 +28,7 @@ func main() {
 	var allowedOrigins []string
 	var logLevel string
 	var showVersion bool
+	var baseURL string
 
 	pflag.StringVar(&addr, "addr", "0.0.0.0:8080", "Address to listen on")
 	pflag.StringSliceVar(&allowedRootAccountHandles, "allowed-root-account-handle", []string{}, "Allowed root account handles")
@@ -35,6 +36,7 @@ func main() {
 	pflag.StringVar(&logLevel, "log-level", "warn", "Log level (debug, info, warn, error)")
 	pflag.StringVar(&otelConfigFile, "otel-config", "", "Path to an OpenTelemetry configuration file")
 	pflag.BoolVar(&showVersion, "version", false, "Print version information")
+	pflag.StringVar(&baseURL, "base-url", "http://localhost:8080", "Base URL to be used for linking inside the results")
 	pflag.Parse()
 
 	if version == "" {
@@ -82,6 +84,7 @@ func main() {
 		AllowedRootAccountDIDs: make([]string, 0, 5),
 		AllowedRootAccounts:    make([]string, 0, 5),
 		Logger:                 logger,
+		BaseURL:                baseURL,
 	}
 
 	// Resolve handles to DIDs

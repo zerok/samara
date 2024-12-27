@@ -11,4 +11,5 @@ type Configuration struct {
 	AllowedRootAccounts    []string
 	Client                 *xrpc.Client
 	Logger                 *slog.Logger
+	BaseURL                string
 }

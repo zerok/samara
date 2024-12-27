@@ -9,6 +9,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -30,11 +31,14 @@ var tracer = otel.Tracer(tracerName)
 var threadURIPattern = regexp.MustCompile(`at://[^/]+/app.bsky.feed.post/[a-z0-9]+`)
 
 type Server struct {
-	cfg         Configuration
-	mux         *http.ServeMux
-	client      *xrpc.Client
-	threadCache *expirable.LRU[string, *bsky.FeedGetPostThread_Output]
-	logger      *slog.Logger
+	cfg                    Configuration
+	mux                    *http.ServeMux
+	client                 *xrpc.Client
+	threadCache            *expirable.LRU[string, *bsky.FeedGetPostThread_Output]
+	allowedAvatarDIDsCache *expirable.LRU[string, bool]
+	logger                 *slog.Logger
+	avatarHTTPClient       *http.Client
+	baseURL                string
 }
 
 type Favorite struct {
@@ -46,17 +50,21 @@ type Favorite struct {
 
 func New(cfg Configuration) *Server {
 	threadCache := expirable.NewLRU[string, *bsky.FeedGetPostThread_Output](10, nil, time.Minute*1)
+	allowedAvatarDIDsCache := expirable.NewLRU[string, bool](1000, nil, time.Minute*1)
 
 	logger := cfg.Logger
 	if logger == nil {
-		logger = slog.New(nil)
+		logger = slog.Default()
 	}
 
 	srv := &Server{
-		cfg:         cfg,
-		client:      cfg.Client,
-		threadCache: threadCache,
-		logger:      logger,
+		cfg:                    cfg,
+		client:                 cfg.Client,
+		threadCache:            threadCache,
+		allowedAvatarDIDsCache: allowedAvatarDIDsCache,
+		logger:                 logger,
+		avatarHTTPClient:       &http.Client{},
+		baseURL:                cfg.BaseURL,
 	}
 
 	if srv.client == nil {
@@ -66,6 +74,7 @@ func New(cfg Configuration) *Server {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/thread", srv.handleGetThread)
+	mux.HandleFunc("/api/v1/avatar", srv.handleGetAvatar)
 	srv.mux = mux
 	return srv
 }
@@ -89,6 +98,42 @@ func (srv *Server) isAllowedAccount(threadURI string) bool {
 		}
 	}
 	return false
+}
+
+func (srv *Server) handleGetAvatar(w http.ResponseWriter, r *http.Request) {
+	var did string
+	did = r.URL.Query().Get("did")
+	ctx, span := tracer.Start(r.Context(), "handleGetAvatar")
+	defer span.End()
+
+	span.SetAttributes(telemetry.AvatarDIDKey.String(did))
+
+	if _, allowed := srv.allowedAvatarDIDsCache.Get(did); !allowed {
+		span.SetStatus(codes.Ok, "not allowed avatar")
+		http.Error(w, "not allowed avatar", http.StatusForbidden)
+		return
+	}
+
+	upstreamURL := "https://cdn.bsky.app/img/avatar_thumbnail/plain/" + did
+	span.SetAttributes(telemetry.AvatarUpstreamURLKey.String(upstreamURL))
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, upstreamURL, nil)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "failed to generate upstream request")
+		http.Error(w, "failed to generate upstream request", http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := srv.avatarHTTPClient.Do(req)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "upstream request failed")
+		http.Error(w, "upstream request failed", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
 }
 
 func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +163,7 @@ func (srv *Server) handleGetThread(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "backend request failed", http.StatusInternalServerError)
 		return
 	}
-	output, html, err := RenderThread(ctx, thread.Thread.FeedDefs_ThreadViewPost, 0)
+	output, html, err := srv.renderThread(ctx, thread.Thread.FeedDefs_ThreadViewPost, 0)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, "rendering failed")
@@ -173,11 +218,11 @@ type ThreadRenderingData struct {
 	ExternalEmbedTitle string                `json:"externalEmbedTitle"`
 }
 
-func RenderThread(ctx context.Context, thread *bsky.FeedDefs_ThreadViewPost, level int) (*ThreadRenderingData, template.HTML, error) {
+func (srv *Server) renderThread(ctx context.Context, thread *bsky.FeedDefs_ThreadViewPost, level int) (*ThreadRenderingData, template.HTML, error) {
 	replies := make([]ThreadRenderingData, 0, len(thread.Replies))
 	renderedReplies := make([]template.HTML, 0, len(thread.Replies))
 	for _, reply := range thread.Replies {
-		r, rendered, err := RenderThread(ctx, reply.FeedDefs_ThreadViewPost, level+1)
+		r, rendered, err := srv.renderThread(ctx, reply.FeedDefs_ThreadViewPost, level+1)
 		if err != nil {
 			return nil, "", err
 		}
@@ -205,6 +250,14 @@ func RenderThread(ctx context.Context, thread *bsky.FeedDefs_ThreadViewPost, lev
 	}
 	if thread.Post.Author.Avatar != nil {
 		data.AuthorAvatar = strings.Replace(*thread.Post.Author.Avatar, "avatar", "avatar_thumbnail", -1)
+		did, err := extractDID(*thread.Post.Author.Avatar)
+		if err == nil {
+
+			srv.allowedAvatarDIDsCache.Add(did, true)
+			params := url.Values{}
+			params.Add("did", did)
+			data.AuthorAvatar = fmt.Sprintf("%s/api/v1/avatar?%s", srv.baseURL, params.Encode())
+		}
 	}
 	parsedURI, err := util.ParseAtUri(thread.Post.Uri)
 	if err != nil {
@@ -223,7 +276,16 @@ func RenderThread(ctx context.Context, thread *bsky.FeedDefs_ThreadViewPost, lev
 	return &data, html, err
 }
 
-func renderThreadToHTML(ctx context.Context, thread ThreadRenderingData) (template.HTML, error) {
+func extractDID(s string) (string, error) {
+	pat := regexp.MustCompile(".*(did:.*)")
+	match := pat.FindStringSubmatch(s)
+	if len(match) < 2 {
+		return "", fmt.Errorf("no did found")
+	}
+	return match[1], nil
+}
+
+func renderThreadToHTML(_ context.Context, thread ThreadRenderingData) (template.HTML, error) {
 	tmpl := template.Must(template.New("thread").Parse(postTmpl))
 	var output bytes.Buffer
 	if err := tmpl.Execute(&output, thread); err != nil {
