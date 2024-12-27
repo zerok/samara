@@ -20,6 +20,10 @@ services:
       - --storage.path=/var/lib/alloy/data
       - --server.http.listen-addr=0.0.0.0:8899
       - --stability.level=experimental # Enable all functionality
+  valkey:
+    image: "valkey/valkey:8.0.1"
+    ports:
+      - "6379:6379"
   website:
     image: "caddy:2.8.4-alpine"
     ports:
