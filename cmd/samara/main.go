@@ -14,6 +14,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/spf13/pflag"
 	"github.com/valkey-io/valkey-go"
+	"github.com/valkey-io/valkey-go/valkeyotel"
 	"github.com/zerok/samara/internal/caching"
 	"github.com/zerok/samara/internal/server"
 	config "go.opentelemetry.io/contrib/config/v0.3.0"
@@ -73,7 +74,7 @@ func main() {
 	var cache caching.Cache
 	var err error
 	if valkeyHostname != "" {
-		valkeyClient, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{valkeyHostname}})
+		valkeyClient, err := valkeyotel.NewClient(valkey.ClientOption{InitAddress: []string{valkeyHostname}})
 		if err != nil {
 			logger.ErrorContext(ctx, "valkey connection failed", "err", err)
 			os.Exit(1)
