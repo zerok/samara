@@ -37,7 +37,7 @@ jobs:
       contents: write
       pull-requests: write
       id-token: write
-    uses: ./.github/workflows/docker.yml
+    uses: ./.github/workflows/docker.yaml
     with:
       tag: ${{ needs.release-please.outputs.release_tag }}
 
