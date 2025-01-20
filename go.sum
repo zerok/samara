@@ -151,10 +151,10 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/urfave/cli v1.22.10/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
-github.com/valkey-io/valkey-go v1.0.52 h1:ojrR736satGucqpllYzal8fUrNNROc11V10zokAyIYg=
-github.com/valkey-io/valkey-go v1.0.52/go.mod h1:BXlVAPIL9rFQinSFM+N32JfWzfCaUAqBpZkc4vPY6fM=
-github.com/valkey-io/valkey-go/valkeyotel v1.0.52 h1:atl4hW5sMHAz6dO775jXDdytbIeK/ow64sIW6Dn1Aa0=
-github.com/valkey-io/valkey-go/valkeyotel v1.0.52/go.mod h1:jPw8S57WrD7fs50ZU8ajJQvxhYDaztGe9OLV/nVwXhs=
+github.com/valkey-io/valkey-go v1.0.53 h1:bntDqQVPzkLdE/4ypXBrHalXJB+BOTMk+JwXNRCGudg=
+github.com/valkey-io/valkey-go v1.0.53/go.mod h1:BXlVAPIL9rFQinSFM+N32JfWzfCaUAqBpZkc4vPY6fM=
+github.com/valkey-io/valkey-go/valkeyotel v1.0.53 h1:jXso4KvFMabgkUAGfk2/W1o6IIiiOagYh6WKSgdfjeI=
+github.com/valkey-io/valkey-go/valkeyotel v1.0.53/go.mod h1:oOwt62yiubR7a9pkgaJmWIs/SED+M5QhTYuLGqpHHog=
 github.com/warpfork/go-wish v0.0.0-20220906213052-39a1cc7a02d0 h1:GDDkbFiaK8jsSDJfjId/PEGEShv6ugrt4kYsC5UIDaQ=
 github.com/warpfork/go-wish v0.0.0-20220906213052-39a1cc7a02d0/go.mod h1:x6AKhvSSexNrVSrViXSHUEbICjmGXhtgABaHIySUSGw=
 github.com/whyrusleeping/cbor-gen v0.1.3-0.20240904181319-8dc02b38228c h1:UsxJNcLPfyLyVaA4iusIrsLAqJn/xh36Qgb8emqtXzk=
