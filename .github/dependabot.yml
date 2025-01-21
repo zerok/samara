@@ -5,6 +5,13 @@ updates:
     package-ecosystem: gomod
     schedule:
       interval: weekly
+    groups:
+      otel:
+        patterns:
+          - "go.opentelemetry.io/*"
+      valkey:
+        patterns:
+          - "github.com/valkey-io/*"
 
   - directory: /
     open-pull-requests-limit: 5
