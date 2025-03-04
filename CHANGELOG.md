@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.1.1](https://github.com/zerok/samara/compare/v0.1.0...v0.1.1) (2025-03-04)
+
+
+### 🔧 Miscellaneous Chores
+
+* add dependabot groups for otel and valkey ([#44](https://github.com/zerok/samara/issues/44)) ([3267fbe](https://github.com/zerok/samara/commit/3267fbe98b6c162f46b0163f0e216073680a45ab))
+* **deps:** bump actions/setup-go from 5.2.0 to 5.3.0 ([#45](https://github.com/zerok/samara/issues/45)) ([05593f7](https://github.com/zerok/samara/commit/05593f7fcf5721e0dc4138e71c42fca866b3d8bc))
+* **deps:** bump docker/build-push-action from 6.10.0 to 6.11.0 ([#35](https://github.com/zerok/samara/issues/35)) ([6c15678](https://github.com/zerok/samara/commit/6c15678952f7241d6b11b202ce1b4f895e7131df))
+* **deps:** bump docker/build-push-action from 6.11.0 to 6.12.0 ([#39](https://github.com/zerok/samara/issues/39)) ([6233011](https://github.com/zerok/samara/commit/6233011610d1cb409865d2145d8d86ee222f6702))
+* **deps:** bump docker/build-push-action from 6.12.0 to 6.13.0 ([#47](https://github.com/zerok/samara/issues/47)) ([0d809c7](https://github.com/zerok/samara/commit/0d809c7bf8156bca43387688eb52779ed08e091d))
+* **deps:** bump docker/build-push-action from 6.13.0 to 6.15.0 ([#58](https://github.com/zerok/samara/issues/58)) ([e6e3c5d](https://github.com/zerok/samara/commit/e6e3c5d949cf294f472b6d5f4684bd04fd4b18d7))
+* **deps:** bump docker/metadata-action from 5.6.1 to 5.7.0 ([#57](https://github.com/zerok/samara/issues/57)) ([f006427](https://github.com/zerok/samara/commit/f006427b38065e5c6057209e04ebd78d7b8855ad))
+* **deps:** bump docker/setup-buildx-action from 3.8.0 to 3.10.0 ([#59](https://github.com/zerok/samara/issues/59)) ([0760000](https://github.com/zerok/samara/commit/076000069d24d4d99db706c590f5dcea25cd6c76))
+* **deps:** bump docker/setup-qemu-action from 3.2.0 to 3.3.0 ([#36](https://github.com/zerok/samara/issues/36)) ([431b2e9](https://github.com/zerok/samara/commit/431b2e96c9203547afc3eff2f0d71f7032b2b130))
+* **deps:** bump docker/setup-qemu-action from 3.3.0 to 3.4.0 ([#51](https://github.com/zerok/samara/issues/51)) ([8e3650f](https://github.com/zerok/samara/commit/8e3650f4a35f6763f1b61454613a95b411b6b765))
+* **deps:** bump docker/setup-qemu-action from 3.4.0 to 3.6.0 ([#56](https://github.com/zerok/samara/issues/56)) ([feba0e1](https://github.com/zerok/samara/commit/feba0e10fa52c6c5d52d9c69b57c3a6a8deab26f))
+* **deps:** bump github.com/spf13/pflag from 1.0.5 to 1.0.6 ([#49](https://github.com/zerok/samara/issues/49)) ([293c46f](https://github.com/zerok/samara/commit/293c46f711b2b7638ded5ea676dd5e4f5e5e55ec))
+* **deps:** bump github.com/valkey-io/valkey-go/valkeyotel from 1.0.52 to 1.0.53 ([#42](https://github.com/zerok/samara/issues/42)) ([f3ec6b0](https://github.com/zerok/samara/commit/f3ec6b064b9608d3f8a0ca06a83f574cff36feb2))
+* **deps:** bump golang from 1.23.4-alpine to 1.23.5-alpine ([#38](https://github.com/zerok/samara/issues/38)) ([2c4f89f](https://github.com/zerok/samara/commit/2c4f89fee73930631aca3294125f0c99496f21a8))
+* **deps:** bump golang from 1.23.5-alpine to 1.23.6-alpine ([#52](https://github.com/zerok/samara/issues/52)) ([bbfad01](https://github.com/zerok/samara/commit/bbfad01a72c6868e24fdbf09a5e1f8a57f3006ab))
+* **deps:** bump golang from 1.23.6-alpine to 1.24.0-alpine ([#53](https://github.com/zerok/samara/issues/53)) ([3855c7a](https://github.com/zerok/samara/commit/3855c7a51560938d0622d30d3ef0046ef7c1d3b5))
+* **deps:** bump the otel group with 2 updates ([#46](https://github.com/zerok/samara/issues/46)) ([5f01af0](https://github.com/zerok/samara/commit/5f01af029d5afe7023b4195a3d2fd21f3f8a2657))
+* **deps:** bump the valkey group with 2 updates ([#48](https://github.com/zerok/samara/issues/48)) ([1c4999a](https://github.com/zerok/samara/commit/1c4999ae8b2295508d0a2458446f5ae1f89bda42))
+* **deps:** bump the valkey group with 2 updates ([#54](https://github.com/zerok/samara/issues/54)) ([65c9981](https://github.com/zerok/samara/commit/65c9981a82e9dc14cf1cf1eca3a37f222f425d67))
+
 ## 0.1.0 (2025-01-06)
 
 
