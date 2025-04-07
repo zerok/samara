@@ -8,8 +8,8 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
-	github.com/valkey-io/valkey-go v1.0.56
-	github.com/valkey-io/valkey-go/valkeyotel v1.0.56
+	github.com/valkey-io/valkey-go v1.0.57
+	github.com/valkey-io/valkey-go/valkeyotel v1.0.57
 	github.com/yuin/goldmark v1.7.8
 	go.opentelemetry.io/contrib/config v0.15.0
 	go.opentelemetry.io/otel v1.35.0
