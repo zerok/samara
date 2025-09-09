@@ -7,7 +7,7 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/rs/cors v1.11.1
 	github.com/spf13/pflag v1.0.10
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	github.com/valkey-io/valkey-go v1.0.64
 	github.com/valkey-io/valkey-go/valkeyotel v1.0.64
 	github.com/yuin/goldmark v1.7.13
