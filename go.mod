@@ -1,6 +1,6 @@
 module github.com/zerok/samara
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/bluesky-social/indigo v0.0.0-20241108221053-6e3c2e3e2dab
@@ -12,7 +12,7 @@ require (
 	github.com/valkey-io/valkey-go/valkeyotel v1.0.69
 	github.com/yuin/goldmark v1.7.16
 	go.opentelemetry.io/contrib/config v0.15.0
-	go.opentelemetry.io/otel v1.38.0
+	go.opentelemetry.io/otel v1.39.0
 )
 
 require (
@@ -63,7 +63,7 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/whyrusleeping/cbor-gen v0.1.3-0.20240904181319-8dc02b38228c // indirect
-	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.11.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.11.0 // indirect
@@ -77,11 +77,11 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.35.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.35.0 // indirect
 	go.opentelemetry.io/otel/log v0.11.0 // indirect
-	go.opentelemetry.io/otel/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/metric v1.39.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.35.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.11.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.35.0 // indirect
-	go.opentelemetry.io/otel/trace v1.38.0 // indirect
+	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
