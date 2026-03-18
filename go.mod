@@ -1,6 +1,8 @@
 module github.com/zerok/samara
 
-go 1.24.9
+go 1.25.0
+
+toolchain go1.26.1
 
 require (
 	github.com/bluesky-social/indigo v0.0.0-20241108221053-6e3c2e3e2dab
