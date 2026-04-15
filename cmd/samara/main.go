@@ -17,10 +17,10 @@ import (
 	"github.com/valkey-io/valkey-go/valkeyotel"
 	"github.com/zerok/samara/internal/caching"
 	"github.com/zerok/samara/internal/server"
-	config "go.opentelemetry.io/contrib/config/v0.3.0"
+	otelconf "go.opentelemetry.io/contrib/otelconf/v0.3.0"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.40.0"
 )
 
 var version string
@@ -145,15 +145,15 @@ func main() {
 }
 
 func setupOTelSDK(ctx context.Context, configPath string) (shutdown func(context.Context) error, err error) {
-	opts := make([]config.ConfigurationOption, 0, 2)
-	opts = append(opts, config.WithContext(ctx))
+	opts := make([]otelconf.ConfigurationOption, 0, 2)
+	opts = append(opts, otelconf.WithContext(ctx))
 
 	if configPath != "" {
 		data, err := os.ReadFile(configPath)
 		if err != nil {
 			return nil, err
 		}
-		otelConfig, err := config.ParseYAML(data)
+		otelConfig, err := otelconf.ParseYAML(data)
 		if err != nil {
 			return nil, err
 		}
@@ -161,9 +161,9 @@ func setupOTelSDK(ctx context.Context, configPath string) (shutdown func(context
 		// We want to override the resource definition to keep name and version
 		// managed by the build process:
 		schemaURL := semconv.SchemaURL
-		res := config.Resource{
+		res := otelconf.Resource{
 			SchemaUrl: &schemaURL,
-			Attributes: []config.AttributeNameValue{
+			Attributes: []otelconf.AttributeNameValue{
 				{
 					Name:  "service.name",
 					Value: "samara",
@@ -175,10 +175,10 @@ func setupOTelSDK(ctx context.Context, configPath string) (shutdown func(context
 			},
 		}
 		otelConfig.Resource = &res
-		opts = append(opts, config.WithOpenTelemetryConfiguration(*otelConfig))
+		opts = append(opts, otelconf.WithOpenTelemetryConfiguration(*otelConfig))
 	}
 
-	sdk, err := config.NewSDK(opts...)
+	sdk, err := otelconf.NewSDK(opts...)
 	if err != nil {
 		return sdk.Shutdown, err
 	}
