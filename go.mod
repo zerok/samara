@@ -12,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/valkey-io/valkey-go v1.0.76
 	github.com/valkey-io/valkey-go/valkeyotel v1.0.76
-	github.com/yuin/goldmark v1.8.2
+	github.com/yuin/goldmark v1.8.4
 	go.opentelemetry.io/contrib/otelconf v0.24.0
 	go.opentelemetry.io/otel v1.44.0
 )
