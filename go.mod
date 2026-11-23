@@ -8,7 +8,7 @@ require (
 	github.com/bluesky-social/indigo v0.0.0-20241108221053-6e3c2e3e2dab
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/rs/cors v1.11.1
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 	github.com/stretchr/testify v1.12.1
 	github.com/valkey-io/valkey-go v1.0.78
 	github.com/valkey-io/valkey-go/valkeyotel v1.0.78
